@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GK Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .answers label {
+            display: block;
+            margin: 5px 0;
+        }
+
+        .answers input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #results {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .correct {
+            background-color: #e6f7ff; /* Light blue */
+            border-left: 5px solid #007bff;
+            padding: 10px;
+            margin-top: 5px;
+        }
+
+        .incorrect {
+            background-color: #ffe6e6; /* Light red */
+            border-left: 5px solid #dc3545;
+            padding: 10px;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>General Knowledge Quiz</h1>
+        <div id="quiz"></div>
+        <button id="submit">Submit Quiz</button>
+        <div id="results"></div>
+    </div>
+    <div class="chart-container">
+        <canvas id="marksChart"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const quizData = [
+            {
+                question: "Which country recently launched the 'Chandrayaan-3' lunar mission?",
+                a: "USA",
+                b: "Russia",
+                c: "India",
+                d: "China",
+                correct: "c"
+            },
+            {
+                question: "Who is the current President of the United States?",
+                a: "Donald Trump",
+                b: "Joe Biden",
+                c: "Barack Obama",
+                d: "Kamala Harris",
+                correct: "b"
+            },
+            {
+                question: "Which city hosted the 2024 Summer Olympics?",
+                a: "Tokyo",
+                b: "Paris",
+                c: "London",
+                d: "Los Angeles",
+                correct: "b"
+            },
+            {
+                question: "What is the new name of the Indian Parliament building?",
+                a: "Sansad Bhavan",
+                b: "Rashtrapati Bhavan",
+                c: "Vigyan Bhavan",
+                d: "Kartavya Path",
+                correct: "a"
+            },
+            {
+                question: "The 'G-20 Summit' 2023 was held in which country?",
+                a: "Brazil",
+                b: "USA",
+                c: "India",
+                d: "Germany",
+                correct: "c"
+            },
+            {
+                question: "Who is the founder and CEO of OpenAI?",
+                a: "Satya Nadella",
+                b: "Sam Altman",
+                c: "Elon Musk",
+                d: "Sundar Pichai",
+                correct: "b"
+            },
+            {
+                question: "Which country won the ICC Men's Cricket World Cup 2023?",
+                a: "India",
+                b: "Australia",
+                c: "England",
+                d: "New Zealand",
+                correct: "b"
+            },
+            {
+                question: "Project Tiger' in India recently completed how many years?",
+                a: "40",
+                b: "50",
+                c: "60",
+                d: "75",
+                correct: "b"
+            },
+            {
+                question: "Who won the Nobel Peace Prize in 2023?",
+                a: "Narges Mohammadi",
+                b: "Ales Bialiatski",
+                c: "Maria Ressa",
+                d: "World Food Programme",
+                correct: "a"
+            },
+            {
+                question: "Which famous social media platform was recently rebranded as 'X'?",
+                a: "Facebook",
+                b: "Twitter",
+                c: "Instagram",
+                d: "TikTok",
+                correct: "b"
+            },
+            {
+                question: "What is the name of the new coronavirus variant that emerged in 2023?",
+                a: "Delta",
+                b: "Omicron",
+                c: "Pirola",
+                d: "Eris",
+                correct: "d"
+            },
+            {
+                question: "Who is the current CEO of Google?",
+                a: "Satya Nadella",
+                b: "Tim Cook",
+                c: "Sundar Pichai",
+                d: "Jeff Bezos",
+                correct: "c"
+            },
+            {
+                question: "Which film won the 'Best Picture' award at the 2024 Academy Awards?",
+                a: "Oppenheimer",
+                b: "Barbie",
+                c: "Killers of the Flower Moon",
+                d: "Poor Things",
+                correct: "a"
+            },
+            {
+                question: "What is the primary focus of the 'COP28' climate summit?",
+                a: "Biodiversity",
+                b: "Sustainable agriculture",
+                c: "Climate change and emissions reduction",
+                d: "Ocean conservation",
+                correct: "c"
+            },
+            {
+                question: "Who is the first female President of the European Commission?",
+                a: "Angela Merkel",
+                b: "Christine Lagarde",
+                c: "Ursula von der Leyen",
+                d: "Jacinda Ardern",
+                correct: "c"
+            },
+            {
+                question: "Meta' is the new parent company of which popular app?",
+                a: "Snapchat",
+                b: "TikTok",
+                c: "Instagram",
+                d: "Twitter",
+                correct: "c"
+            },
+            {
+                question: "Which Indian state recently launched the 'Griha Lakshmi' scheme?",
+                a: "Maharashtra",
+                b: "Karnataka",
+                c: "Kerala",
+                d: "Tamil Nadu",
+                correct: "b"
+            },
+            {
+                question: "Who is the first Indian to win a gold medal in the World Athletics Championships?",
+                a: "Milkha Singh",
+                b: "Neeraj Chopra",
+                c: "PT Usha",
+                d: "Anju Bobby George",
+                correct: "b"
+            },
+            {
+                question: "Which city is known as the 'Silicon Valley of India'?",
+                a: "Mumbai",
+                b: "Hyderabad",
+                c: "Bangalore",
+                d: "Chennai",
+                correct: "c"
+            },
+            {
+                question: "What is the official currency of the United Arab Emirates?",
+                a: "Rial",
+                b: "Dinar",
+                c: "Dirham",
+                d: "Rupiah",
+                correct: "c"
+            }
+        ];
+
+        const quiz = document.getElementById('quiz');
+        const resultsDiv = document.getElementById('results');
+        const submitBtn = document.getElementById('submit');
+        const marksChartCtx = document.getElementById('marksChart').getContext('2d');
+
+        let score = 0;
+        let userAnswers = {};
+
+        function buildQuiz() {
+            const output = [];
+            quizData.forEach((currentQuestion, questionNumber) => {
+                const answers = [];
+                for (letter in currentQuestion) {
+                    if (letter !== 'question' && letter !== 'correct') {
+                        answers.push(
+                            `<label>
+                                <input type="radio" name="question${questionNumber}" value="${letter}">
+                                ${currentQuestion[letter]}
+                            </label>`
+                        );
+                    }
+                }
+                output.push(
+                    `<div class="question">${questionNumber + 1}. ${currentQuestion.question}</div>
+                    <div class="answers">${answers.join('')}</div>`
+                );
+            });
+            quiz.innerHTML = output.join('');
+        }
+
+        function showResults() {
+            const answerContainers = quiz.querySelectorAll('.answers');
+            score = 0;
+
+            quizData.forEach((currentQuestion, questionNumber) => {
+                const answerContainer = answerContainers[questionNumber];
+                const selector = `input[name=question${questionNumber}]:checked`;
+                const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+                userAnswers[questionNumber] = userAnswer;
+
+                if (userAnswer === currentQuestion.correct) {
+                    score++;
+                }
+            });
+
+            resultsDiv.innerHTML = `Your score is **${score} out of ${quizData.length}**.<br>
+                                    Your rank is **${getRank(score)}**.<br><br>
+                                    Here are the correct answers:`;
+            
+            quizData.forEach((currentQuestion, questionNumber) => {
+                const answerContainer = answerContainers[questionNumber];
+                const correctLetter = currentQuestion.correct;
+                const correctText = currentQuestion[correctLetter];
+                const userAnswer = userAnswers[questionNumber];
+
+                let resultClass = '';
+                if (userAnswer === correctLetter) {
+                    resultClass = 'correct';
+                } else {
+                    resultClass = 'incorrect';
+                }
+
+                const correctAnswerHTML = `<div class="${resultClass}">
+                                            Your answer: **${userAnswer ? currentQuestion[userAnswer] : 'Not Answered'}** <br>
+                                            Correct answer: **${correctText}**
+                                           </div>`;
+                answerContainer.innerHTML = correctAnswerHTML;
+            });
+
+            submitBtn.style.display = 'none';
+            
+            createMarksChart(score, quizData.length);
+        }
+
+        function getRank(score) {
+            if (score >= 18) {
+                return "Excellent!";
+            } else if (score >= 15) {
+                return "Good!";
+            } else if (score >= 10) {
+                return "Average.";
+            } else {
+                return "Needs Improvement.";
+            }
+        }
+
+        function createMarksChart(marks, total) {
+            new Chart(marksChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correct', 'Incorrect'],
+                    datasets: [{
+                        data: [marks, total - marks],
+                        backgroundColor: ['#007bff', '#ff6666'], /* Blue for correct, Pink/Red for incorrect */
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Your Performance'
+                        }
+                    }
+                }
+            });
+        }
+
+        buildQuiz();
+        submitBtn.addEventListener('click', showResults);
+    </script>
+</body>
+</html>
